@@ -1,50 +1,20 @@
+import Link from "next/link"
+import { ArrowRight, Clock3, FileText, Plus, Search, ShieldCheck, Sparkles, Upload } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { AppShell } from "@/components/app-shell"
+import { contractService, demoActivity, demoContracts, demoUsage, pageDescriptions, routeCards, statusTone } from "@/lib/domain"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
-import { DashboardNav } from "@/components/dashboard-nav"
-import { ContractReviewSection } from "@/components/contract-review-section"
-import { LegalResearchSection } from "@/components/legal-research-section"
-import { ComplianceSection } from "@/components/compliance-section"
-import { getOrCreateProfile } from "@/lib/supabase/server"
 
 export default async function Dashboard() {
   const supabase = await createClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    redirect("/auth/login")
-  }
-
-  const profile = await getOrCreateProfile(session.user.id)
-
-  if (!profile) {
-    redirect("/auth/login")
-  }
-
-  return (
-    <div className="min-h-screen bg-neutral-50">
-      <DashboardNav profile={profile} />
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome back, {profile?.full_name || "User"}</h1>
-          <p className="text-neutral-600">
-            {profile?.company_name} • {profile?.user_type?.replace(/_/g, " ")}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <ContractReviewSection />
-            <LegalResearchSection />
-          </div>
-
-          <div>
-            <ComplianceSection />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session && process.env.NEXT_PUBLIC_DEMO_MODE === "false") redirect("/auth/login")
+  const profile = session ? { full_name: session.user.user_metadata?.full_name, email: session.user.email } : null
+  const result = await contractService.listContracts()
+  const contracts = result.data ?? demoContracts
+  return <AppShell profile={profile}><div className="flex flex-col gap-7"><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-medium text-primary">Good morning, {profile?.full_name?.split(" ")[0] || "Maya"}</p><h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Your legal workspace</h1><p className="mt-2 max-w-2xl text-sm text-muted-foreground">{pageDescriptions.contracts} Keep the next decision visible.</p></div><Button asChild><Link href="/dashboard/contracts"><Upload data-icon="inline-start" /> Upload contract</Link></Button></div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{routeCards.map((item) => <Link key={item.href} href={item.href} className="group"><Card className="h-full transition-colors hover:border-primary/50"><CardContent className="flex items-center gap-3 p-4"><div className="grid size-9 place-items-center rounded-lg bg-primary/10 text-primary"><Sparkles className="size-4" /></div><span className="text-sm font-medium">{item.label}</span><ArrowRight className="ml-auto size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" /></CardContent></Card></Link>)}</div><div className="grid gap-6 lg:grid-cols-[1.4fr_.8fr]"><Card><CardHeader className="flex flex-row items-start justify-between gap-3"><div><CardTitle>Recent contracts</CardTitle><CardDescription>Agreements moving through your review queue.</CardDescription></div><Button asChild variant="ghost" size="sm"><Link href="/dashboard/contracts">View all <ArrowRight data-icon="inline-end" /></Link></Button></CardHeader><CardContent className="px-0"><div className="flex flex-col">{contracts.map((contract) => <Link key={contract.id} href={`/dashboard/contracts/${contract.id}`} className="flex items-center gap-3 border-t border-border px-6 py-4 transition-colors hover:bg-muted/40"><div className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted"><FileText className="size-4 text-muted-foreground" /></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{contract.title}</p><p className="mt-1 text-xs text-muted-foreground">{contract.fileType} · Updated {contract.updatedAt}</p></div>{contract.riskLevel && <Badge variant={contract.riskLevel === "High" ? "destructive" : "secondary"}>{contract.riskLevel} risk</Badge>}<Badge variant={statusTone(contract.status) === "success" ? "default" : "outline"}>{contract.status}</Badge></Link>)}</div></CardContent></Card><div className="flex flex-col gap-6"><Card><CardHeader><CardTitle>Usage this month</CardTitle><CardDescription>Professional plan</CardDescription></CardHeader><CardContent className="flex flex-col gap-5">{demoUsage.map((item) => <div key={item.label}><div className="mb-2 flex justify-between text-sm"><span>{item.label}</span><span className="text-muted-foreground">{item.used} / {item.limit}</span></div><Progress value={(item.used / item.limit) * 100} /><p className="mt-1 text-xs text-muted-foreground">{item.unit}</p></div>)}<Button asChild variant="outline" size="sm"><Link href="/dashboard/billing">Manage plan</Link></Button></CardContent></Card><Card><CardHeader><CardTitle>Recent activity</CardTitle></CardHeader><CardContent className="flex flex-col gap-4">{demoActivity.map((item) => <div key={item} className="flex gap-3"><Clock3 className="mt-0.5 size-4 text-muted-foreground" /><div><p className="text-sm">{item}</p><p className="mt-1 text-xs text-muted-foreground">Today</p></div></div>)}</CardContent></Card></div></div><Card className="border-primary/20 bg-primary/5"><CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center"><div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><ShieldCheck className="size-5" /></div><div className="flex-1"><p className="font-medium">A clearer way to review legal work</p><p className="mt-1 text-sm text-muted-foreground">Your findings include explanations, confidence, and suggested next actions—not just a score.</p></div><Button asChild variant="outline"><Link href="/dashboard/contracts/nda-2026">Open analysis <ArrowRight data-icon="inline-end" /></Link></Button></CardContent></Card></div></AppShell>
 }

@@ -1,51 +1,30 @@
 import Link from "next/link"
+import { ArrowRight, Check, FileText, Search, ShieldCheck, Sparkles, LockKeyhole, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { appDescription, appName, appTagline, featureCards, faqItems, footerLinks, pricingPlans, productPromise } from "@/lib/domain"
 
-export default async function Home() {
-  const supabase = await createClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+const icons = { FileText, Search, ShieldCheck }
 
-  if (session) {
-    redirect("/dashboard")
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center px-4">
-      <div className="max-w-2xl text-center text-white">
-        <h1 className="text-5xl font-bold mb-6">AI Legal Assistant</h1>
-        <p className="text-xl mb-8 opacity-90">
-          Automate contract review, legal research, and compliance checks. Save time and reduce legal costs for your
-          business.
-        </p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/auth/login">
-            <Button className="bg-white text-primary hover:bg-neutral-100">Sign In</Button>
-          </Link>
-          <Link href="/auth/sign-up">
-            <Button variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent">
-              Create Account
-            </Button>
-          </Link>
-        </div>
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg">
-            <h3 className="font-bold text-lg mb-2">Contract Review</h3>
-            <p className="text-sm opacity-90">AI-powered analysis of contracts with risk assessment</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg">
-            <h3 className="font-bold text-lg mb-2">Legal Research</h3>
-            <p className="text-sm opacity-90">Instant legal insights and precedent research</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg">
-            <h3 className="font-bold text-lg mb-2">Compliance Checks</h3>
-            <p className="text-sm opacity-90">Automated compliance verification and recommendations</p>
-          </div>
-        </div>
+export default function Home() {
+  return <main className="min-h-screen bg-background text-foreground">
+    <header className="border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight"><span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"><Sparkles className="size-4" /></span><span className="text-lg">{appName}</span></Link>
+        <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">{["Features", "Solutions", "Pricing", "Security", "About"].map((item) => <Link key={item} href={`/${item.toLowerCase()}`} className="transition-colors hover:text-foreground">{item}</Link>)}</nav>
+        <div className="flex items-center gap-2"><Link href="/auth/login" className="hidden text-sm font-medium sm:block">Sign in</Link><Button asChild size="sm"><Link href="/auth/sign-up">Start free <ArrowRight data-icon="inline-end" /></Link></Button></div>
       </div>
-    </div>
-  )
+    </header>
+    <section className="border-b border-border/70 bg-muted/25">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-8 lg:py-24">
+        <div><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground"><LockKeyhole className="size-3.5 text-primary" /> Built for confidential legal work</div><h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight sm:text-6xl">Understand contracts faster. <span className="text-primary">Spot legal risks earlier.</span></h1><p className="mt-6 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">{appDescription}</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button asChild size="lg"><Link href="/auth/sign-up">Analyze a contract <ArrowRight data-icon="inline-end" /></Link></Button><Button asChild variant="outline" size="lg"><Link href="/features">Explore the platform</Link></Button></div><p className="mt-4 text-xs text-muted-foreground">No credit card required. AI-generated information is not legal advice.</p></div>
+        <div className="rounded-2xl border border-border bg-card p-3 shadow-xl shadow-primary/5"><div className="rounded-xl border border-border bg-muted/30 p-4"><div className="flex items-center justify-between border-b border-border pb-4"><div><p className="text-xs text-muted-foreground">Contract analysis</p><p className="font-medium">Mutual NDA · Northstar Labs</p></div><span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-900">Medium risk</span></div><div className="grid gap-3 py-5 sm:grid-cols-3"><div className="rounded-lg bg-background p-3"><p className="text-xs text-muted-foreground">Risk score</p><p className="mt-1 text-2xl font-semibold">58<span className="text-sm text-muted-foreground">/100</span></p></div><div className="rounded-lg bg-background p-3"><p className="text-xs text-muted-foreground">Findings</p><p className="mt-1 text-2xl font-semibold">06</p></div><div className="rounded-lg bg-background p-3"><p className="text-xs text-muted-foreground">Confidence</p><p className="mt-1 text-2xl font-semibold">94%</p></div></div><div className="flex flex-col gap-3"><div className="rounded-lg border border-border bg-background p-3"><div className="flex items-center justify-between"><p className="text-sm font-medium">Unlimited liability</p><span className="text-xs font-medium text-destructive">High risk</span></div><p className="mt-1 text-xs leading-5 text-muted-foreground">Negotiate a liability cap tied to contract value.</p></div><div className="rounded-lg border border-border bg-background p-3"><div className="flex items-center justify-between"><p className="text-sm font-medium">Asymmetric termination</p><span className="text-xs font-medium text-amber-700">Review</span></div><p className="mt-1 text-xs leading-5 text-muted-foreground">Add mutual termination rights and a wind-down payment.</p></div></div></div></div>
+      </div>
+    </section>
+    <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><div className="grid gap-6 border-y border-border py-7 sm:grid-cols-3">{productPromise.map((item, index) => <div key={item} className="flex items-center gap-3"><span className="grid size-8 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">{index + 1}</span><span className="font-medium">{item}</span></div>)}</div><div className="mt-16 max-w-2xl"><p className="text-sm font-medium text-primary">One workspace for legal clarity</p><h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">From first upload to informed action.</h2><p className="mt-4 leading-7 text-muted-foreground">Lexora connects the work that usually lives across folders, chat threads, and spreadsheets.</p></div><div className="mt-10 grid gap-4 md:grid-cols-3">{featureCards.map(([title, description, icon]) => { const Icon = icons[icon as keyof typeof icons]; return <article key={title} className="rounded-xl border border-border bg-card p-6"><div className="mb-12 grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="size-5" /></div><h3 className="text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p><Link href="/features" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-primary">Learn more <ArrowRight className="size-4" /></Link></article> })}</div></section>
+    <section className="bg-primary text-primary-foreground"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[.85fr_1.15fr] lg:px-8"><div><p className="text-sm font-medium text-primary-foreground/70">Designed for teams</p><h2 className="mt-3 text-3xl font-semibold tracking-tight">Legal work that earns trust.</h2><p className="mt-4 max-w-md leading-7 text-primary-foreground/75">Keep findings structured, sources visible, and every next step clear for the people making decisions.</p></div><div className="grid gap-3 sm:grid-cols-3">{["Contracts", "Research", "Compliance"].map((label) => <div key={label} className="rounded-xl border border-primary-foreground/15 bg-primary-foreground/10 p-4"><p className="font-medium">{label}</p><p className="mt-8 text-sm text-primary-foreground/70">Purpose-built workflows, not generic chat.</p></div>)}</div></div></section>
+    <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-medium text-primary">Simple, transparent plans</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Start with the work you have today.</h2></div><Link href="/pricing" className="text-sm font-medium text-primary">Compare plans <ArrowRight className="ml-1 inline size-4" /></Link></div><div className="mt-8 grid gap-4 lg:grid-cols-3">{pricingPlans.map((plan) => <div key={plan.name} className={`rounded-xl border p-6 ${plan.name === "Professional" ? "border-primary bg-primary/5" : "border-border bg-card"}`}><div className="flex items-center justify-between"><h3 className="font-semibold">{plan.name}</h3>{plan.name === "Professional" && <span className="rounded-full bg-primary px-2 py-1 text-[10px] font-medium text-primary-foreground">Recommended</span>}</div><p className="mt-2 text-sm text-muted-foreground">{plan.description}</p><p className="mt-6 text-3xl font-semibold">{plan.price}{plan.price !== "Custom" && <span className="text-sm font-normal text-muted-foreground"> / month</span>}</p><ul className="mt-6 flex flex-col gap-3">{plan.features.map((feature) => <li key={feature} className="flex gap-2 text-sm"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{feature}</li>)}</ul></div>)}</div></section>
+    <section className="border-t border-border bg-muted/20"><div className="mx-auto max-w-3xl px-5 py-16 lg:px-8"><div className="text-center"><p className="text-sm font-medium text-primary">Questions, answered</p><h2 className="mt-2 text-3xl font-semibold tracking-tight">Built with clarity in mind.</h2></div><Accordion type="single" collapsible className="mt-8">{faqItems.map(([question, answer], index) => <AccordionItem value={`faq-${index}`} key={question}><AccordionTrigger>{question}</AccordionTrigger><AccordionContent>{answer}</AccordionContent></AccordionItem>)}</Accordion></div></section>
+    <footer className="border-t border-border"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-[1.5fr_repeat(3,1fr)] lg:px-8"><div><Link href="/" className="flex items-center gap-2 font-semibold"><span className="grid size-7 place-items-center rounded bg-primary text-primary-foreground"><Sparkles className="size-3.5" /></span>{appName}</Link><p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">{appTagline}</p></div>{Object.entries(footerLinks).map(([group, links]) => <div key={group}><p className="text-sm font-semibold">{group}</p><div className="mt-4 flex flex-col gap-3">{links.map((link) => <Link key={link} href={`/${link.toLowerCase().replaceAll(" ", "-")}`} className="text-sm text-muted-foreground hover:text-foreground">{link}</Link>)}</div></div>)}</div><div className="mx-auto flex max-w-7xl flex-col gap-2 border-t border-border px-5 py-5 text-xs text-muted-foreground sm:flex-row sm:justify-between lg:px-8"><span>© 2026 Lexora. Informational use only.</span><span>AI output is not a substitute for qualified legal advice.</span></div></footer>
+  </main>
 }
