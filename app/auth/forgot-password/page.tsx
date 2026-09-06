@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { AlertCircle, Loader2, CheckCircle } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
