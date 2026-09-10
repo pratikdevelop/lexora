@@ -1,0 +1,6 @@
+{
+  "name": "Lexora - AI Legal Assistant",
+  "description": "Automate contract review, legal research, and compliance checks with AI",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

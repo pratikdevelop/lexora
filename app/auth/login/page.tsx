@@ -95,6 +95,15 @@ export default function LoginPage() {
                 "Sign In"
               )}
             </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/dashboard")}
+              className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 mt-2"
+            >
+              Explore Demo Dashboard
+            </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-neutral-700">

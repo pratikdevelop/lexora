@@ -58,7 +58,7 @@ export function ComplianceSection() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div id="compliance-section" className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center gap-3 mb-6">
         <Shield className="w-6 h-6 text-secondary" />
         <h2 className="text-2xl font-bold text-primary">Compliance Check</h2>
@@ -75,6 +75,7 @@ export function ComplianceSection() {
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">Compliance Type</label>
           <select
+            id="compliance-type-select"
             value={checkType}
             onChange={(e) => setCheckType(e.target.value)}
             className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
@@ -90,6 +91,7 @@ export function ComplianceSection() {
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">Subject</label>
           <input
+            id="compliance-subject-input"
             type="text"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
@@ -100,6 +102,7 @@ export function ComplianceSection() {
         </div>
 
         <Button
+          id="compliance-submit-button"
           onClick={handleCheck}
           disabled={loading || !subject}
           className="w-full bg-secondary text-white hover:bg-blue-600"

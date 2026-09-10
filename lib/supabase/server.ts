@@ -3,8 +3,10 @@ import { cookies } from "next/headers"
 
 export async function createClient() {
   const cookieStore = await cookies()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co"
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key"
 
-  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -23,34 +25,69 @@ export async function createClient() {
 }
 
 export async function getOrCreateProfile(userId: string) {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  // Try to get existing profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle()
+    // Try to get existing profile
+    const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle()
 
-  // If profile doesn't exist, create default one
-  if (!profile) {
-    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
-
-    const { data: newProfile, error: createError } = await supabase
-      .from("profiles")
-      .insert({
-        id: userId,
-        email: authUser?.user?.email || "",
-        full_name: authUser?.user?.user_metadata?.full_name || "User",
-        company_name: authUser?.user?.user_metadata?.company_name || "Company",
-        user_type: authUser?.user?.user_metadata?.user_type || "startup",
-      })
-      .select()
-      .single()
-
-    if (createError) {
-      console.error("[v0] Error creating profile:", createError)
-      return null
+    if (profile) {
+      return profile
     }
 
-    return newProfile
-  }
+    // Try to retrieve admin user metadata or create
+    let fullName = "User"
+    let companyName = "Company"
+    let userType = "startup"
+    let email = "user@example.com"
 
-  return profile
+    try {
+      const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+      if (authUser?.user) {
+        email = authUser.user.email || email
+        fullName = authUser.user.user_metadata?.full_name || fullName
+        companyName = authUser.user.user_metadata?.company_name || companyName
+        userType = authUser.user.user_metadata?.user_type || userType
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      const { data: newProfile, error: createError } = await supabase
+        .from("profiles")
+        .insert({
+          id: userId,
+          email,
+          full_name: fullName,
+          company_name: companyName,
+          user_type: userType,
+        })
+        .select()
+        .single()
+
+      if (!createError && newProfile) {
+        return newProfile
+      }
+    } catch {
+      // ignore
+    }
+
+    return {
+      id: userId,
+      email,
+      full_name: fullName,
+      company_name: companyName,
+      user_type: userType,
+    }
+  } catch (err) {
+    console.warn("Could not query or create Supabase profile, using fallback profile:", err)
+    return {
+      id: userId,
+      email: "counsel@company.com",
+      full_name: "Legal Counsel",
+      company_name: "Lexora Legal Corp",
+      user_type: "startup",
+    }
+  }
 }

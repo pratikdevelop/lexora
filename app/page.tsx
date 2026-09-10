@@ -4,13 +4,17 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
 export default async function Home() {
-  const supabase = await createClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  try {
+    const supabase = await createClient()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  if (session) {
-    redirect("/dashboard")
+    if (session) {
+      redirect("/dashboard")
+    }
+  } catch {
+    // offline / unconfigured fallback
   }
 
   return (
@@ -22,8 +26,15 @@ export default async function Home() {
           business.
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
+          <Link href="/dashboard">
+            <Button className="bg-white text-primary hover:bg-neutral-100 font-semibold">
+              Open Dashboard
+            </Button>
+          </Link>
           <Link href="/auth/login">
-            <Button className="bg-white text-primary hover:bg-neutral-100">Sign In</Button>
+            <Button variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent">
+              Sign In
+            </Button>
           </Link>
           <Link href="/auth/sign-up">
             <Button variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent">

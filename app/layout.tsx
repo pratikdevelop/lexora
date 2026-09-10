@@ -3,9 +3,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "AI Legal Assistant",
-  description: "Automate contract review, legal research, and compliance checks",
-    generator: 'v0.app'
+  title: "Lexora - AI Legal Assistant",
+  description: "Automate contract review, legal research, and compliance checks with AI",
 }
 
 export default function RootLayout({

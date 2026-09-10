@@ -6,33 +6,49 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    let userId = "demo-user"
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
+        userId = user.id
+      }
+    } catch {
+      // Fallback to demo user
     }
 
     const { query } = await request.json()
+    if (!query) {
+      return NextResponse.json({ error: "Query is required" }, { status: 400 })
+    }
 
     const result = await performLegalResearch(query)
 
-    // Save research to database
-    const { data, error } = await supabase
-      .from("research_queries")
-      .insert({
-        user_id: user.id,
-        query,
-        result,
-      })
-      .select()
-      .single()
+    let researchId = `res_${Date.now()}`
 
-    if (error) throw error
+    // Save research to database if available
+    try {
+      const { data, error } = await supabase
+        .from("research_queries")
+        .insert({
+          user_id: userId,
+          query,
+          result,
+        })
+        .select()
+        .single()
+
+      if (!error && data?.id) {
+        researchId = data.id
+      }
+    } catch (dbErr) {
+      console.warn("Database storage skipped (offline mode):", dbErr)
+    }
 
     return NextResponse.json({
       result,
-      researchId: data.id,
+      researchId,
     })
   } catch (error) {
     console.error("Error performing research:", error)

@@ -70,7 +70,7 @@ export function ContractReviewSection() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div id="contract-review-section" className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center gap-3 mb-6">
         <FileText className="w-6 h-6 text-secondary" />
         <h2 className="text-2xl font-bold text-primary">Contract Review</h2>
@@ -87,6 +87,7 @@ export function ContractReviewSection() {
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">Upload Contract</label>
           <input
+            id="contract-file-upload"
             type="file"
             onChange={handleFileChange}
             accept=".pdf,.doc,.docx,.txt"
@@ -98,6 +99,7 @@ export function ContractReviewSection() {
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">Or paste contract content</label>
           <textarea
+            id="contract-text-input"
             value={contractText}
             onChange={(e) => setContractText(e.target.value)}
             className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary resize-none h-32"
@@ -106,6 +108,7 @@ export function ContractReviewSection() {
         </div>
 
         <Button
+          id="contract-review-submit-button"
           onClick={handleReview}
           disabled={loading || !contractText}
           className="w-full bg-secondary text-white hover:bg-blue-600"

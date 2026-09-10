@@ -42,7 +42,7 @@ export function LegalResearchSection() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div id="legal-research-section" className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center gap-3 mb-6">
         <Search className="w-6 h-6 text-secondary" />
         <h2 className="text-2xl font-bold text-primary">Legal Research</h2>
@@ -59,6 +59,7 @@ export function LegalResearchSection() {
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">Research Query</label>
           <input
+            id="legal-research-query-input"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -69,6 +70,7 @@ export function LegalResearchSection() {
         </div>
 
         <Button
+          id="legal-research-submit-button"
           onClick={handleResearch}
           disabled={loading || !query}
           className="w-full bg-secondary text-white hover:bg-blue-600"
